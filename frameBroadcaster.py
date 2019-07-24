@@ -3,9 +3,10 @@ import queue
 import threading
 
 import time
+from networkingConstants import *
 
 class FrameBroadCaster():
-    def __init__(self, bufferSize = 4096, port = 20001):
+    def __init__(self, bufferSize = bufferSize, port = MASTER_UDP_PORT):
         self.connected_addresses = {}
         self.bufferSize = bufferSize
         self.localIP =  "0.0.0.0"

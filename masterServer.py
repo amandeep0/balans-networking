@@ -7,7 +7,7 @@ import struct
 import zlib
 import time
 from frameBroadcaster import *
-
+from networkingConstants import *
 
 
 def connectRasPi(HOST, PORT):
@@ -24,13 +24,13 @@ def relayData(conn):
     data = b""
     payload_size = struct.calcsize(">L")
     print("payload_size: {}".format(payload_size))
-    socket = FrameBroadCaster(port=20001)
+    socket = FrameBroadCaster(port=MASTER_UDP_PORT)
     listenor_thread = threading.Thread(target=socket.listenInterceptors)
     listenor_thread.start()
     while True:
         while len(data) < payload_size:
             print("Recv: {}".format(len(data)))
-            received_data = conn.recv(4096)
+            received_data = conn.recv(bufferSize)
             print("Relaying Received Data")
             socket.sendData(received_data)
             data += received_data
@@ -40,7 +40,7 @@ def relayData(conn):
         msg_size = struct.unpack(">L", packed_msg_size)[0]
         print("msg_size: {}".format(msg_size))
         while len(data) < msg_size:
-            data += conn.recv(4096)
+            data += conn.recv(bufferSize)
         frame_data = data[:msg_size]
         data = data[msg_size:]
 
