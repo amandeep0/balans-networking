@@ -4,34 +4,37 @@ import struct
 import pickle
 import cv2
 
+
 def interceptMaster():
-    msgFromClient = "balans_rocks"
-    bytesToSend = str.encode(msgFromClient)
-    serverAddressPort = (MASTER_IP, MASTER_UDP_PORT )
-# Create a UDP socket at client side
-    UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-# Send to server using created UDP socket
-    UDPClientSocket.sendto(bytesToSend, serverAddressPort)
-    return UDPClientSocket
+   while True:
+       try:
+           s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+           s.connect((host, port))
+           return s, s.makefile('wb')
+       except:
+           print("socket error reconnecting")
+           time.sleep(5)
+
+
+
+
 
 while True:
-    UDPClientSocket = interceptMaster()
+    TCPClientSocket, Conn = interceptMaster()
     data = b""
     payload_size = struct.calcsize(">L")
     print("payload_size: {}".format(payload_size))
     while True:
         while len(data) < payload_size:
             print("Recv: {}".format(len(data)))
-            recv, addr =  UDPClientSocket.recvfrom(bufferSize)
-            data += recv
+            data +=  TCPClientSocket.recv(bufferSize)
         print("Done Recv: {}".format(len(data)))
         packed_msg_size = data[:payload_size]
         data = data[payload_size:]
         msg_size = struct.unpack(">L", packed_msg_size)[0]
         print("msg_size: {}".format(msg_size))
         while len(data) < msg_size:
-            recv, addr = UDPClientSocket.recvfrom(bufferSize)
-            data += recv
+            data += TCPClientSocket.recv(bufferSize)
         frame_data = data[:msg_size]
         data = data[msg_size:]
 
@@ -45,7 +48,7 @@ while True:
             cv2.imshow('frame', resized)
             cv2.waitKey(1000)
         except:
-            print("Problem broadcasting")
+            print("Problem Broadcasting")
 
 
 
