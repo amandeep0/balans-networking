@@ -19,8 +19,9 @@ class FrameBroadCaster():
         s.bind((self.localIP,port))
         print('Socket bind complete')
         s.listen(10)
-        conn,addr=s.accept()
+        conn, addr=s.accept()
         self.TCPServerSocket.append({port: conn})
+    
     def listenInterceptors(self):
         for port in self.localPorts:
             listenor_thread = threading.Thread(target=self.initiateConnection, args=(port))
