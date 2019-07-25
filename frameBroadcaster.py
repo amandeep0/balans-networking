@@ -13,31 +13,18 @@ class FrameBroadCaster():
         self.localPorts = ports
         self.TCPServerSocket = []
         #asyncio.gather(self.listenInterceptors(self.UDPServerSocket))
-    def connectRasPi(HOST, PORT):
-    s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    print('Socket created')
-    s.bind((HOST,PORT))
-    print('Socket bind complete')
-    s.listen(10)
-    conn,addr=s.accept()
-    return (conn,addr)
-
-    
-    
+    def initiateConnection(self, port):
+        s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        print('Socket created')
+        s.bind((self.localIP,port))
+        print('Socket bind complete')
+        s.listen(10)
+        conn,addr=s.accept()
+        self.TCPServerSocket.append({port: conn})
     def listenInterceptors(self):
-        while True:
-            print("Waiting For Interception")
-            bytesAddressPair = self.UDPServerSocket.recvfrom(self.bufferSize)
-            message = bytesAddressPair[0]
-            address = bytesAddressPair[1]
-            print("Intercepted: ", address)
-            if address not in self.connected_addresses:
-                self.connected_addresses[address] = 1
-    def initiateConnection(self):
-        UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        UDPServerSocket.bind((self.localIP, self.localPort))
-        print("Binded to Socket")
-        return UDPServerSocket
+        for port in self.localPorts:
+            listenor_thread = threading.Thread(target=self.initiateConnection, args=(port))
+        listenor_thread.start()
 
     def sendData(self, bytesToSend):
         addresses = self.connected_addresses.keys()
