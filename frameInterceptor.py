@@ -3,8 +3,10 @@ from networkingConstants import *
 import struct
 import pickle
 import cv2
+import time
 
-
+host=MASTER_IP
+port=MASTER_RELAY_PORTS[1]
 def interceptMaster():
    while True:
        try:
@@ -14,10 +16,6 @@ def interceptMaster():
        except:
            print("socket error reconnecting")
            time.sleep(5)
-
-
-
-
 
 while True:
     TCPClientSocket, Conn = interceptMaster()
@@ -46,7 +44,7 @@ while True:
             resized = cv2.resize(frame, (64,64), interpolation = cv2.INTER_AREA)
             cv2.imwrite('frame.jpg', resized)
             cv2.imshow('frame', resized)
-            cv2.waitKey(1000)
+            cv2.waitKey(1)
         except:
             print("Problem Broadcasting")
 
