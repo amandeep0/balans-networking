@@ -1,3 +1,3 @@
 bufferSize      = 4096
-MASTER_IP       = "159.203.116.79"
+MASTER_IP       = "167.71.166.191"
 MASTER_UDP_PORT = 20001
