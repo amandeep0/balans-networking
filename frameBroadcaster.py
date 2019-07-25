@@ -6,12 +6,12 @@ import time
 from networkingConstants import *
 
 class FrameBroadCaster():
-    def __init__(self, bufferSize = bufferSize, port = MASTER_UDP_PORT):
+    def __init__(self, bufferSize = bufferSize, port = MASTER_RELAY_PORTS):
         self.connected_addresses = {}
         self.bufferSize = bufferSize
         self.localIP =  "0.0.0.0"
-        self.localPort = port
-        self.UDPServerSocket = self.initiateConnection()
+        self.localPorts = ports
+        self.TCPServerSocket = []
         #asyncio.gather(self.listenInterceptors(self.UDPServerSocket))
     def listenInterceptors(self):
         while True:
