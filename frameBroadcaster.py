@@ -1,12 +1,11 @@
 import socket
-import queue
 import threading
 
 import time
 from networkingConstants import *
 
 class FrameBroadCaster():
-    def __init__(self, bufferSize = bufferSize, port = MASTER_RELAY_PORTS):
+    def __init__(self, bufferSize = bufferSize, ports = MASTER_RELAY_PORTS):
         self.connected_addresses = {}
         self.bufferSize = bufferSize
         self.localIP =  "0.0.0.0"
@@ -15,13 +14,14 @@ class FrameBroadCaster():
         #asyncio.gather(self.listenInterceptors(self.UDPServerSocket))
     
     def initiateConnection(self, port):
-        print("Connection Initiated : ", port)
+        print("Interceptor Listening Initiated : ", port)
         s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        print('Socket created')
+        print('Interceptor socket created')
         s.bind((self.localIP,port))
-        print('Socket bind complete')
+        print('Interceptor bind complete')
         s.listen(10)
         conn, addr=s.accept()
+        print("Intercepted", port)
         self.TCPServerSocket.append((port, conn))
     
     def listenInterceptors(self):
@@ -31,6 +31,8 @@ class FrameBroadCaster():
 
     def sendData(self, bytesToSend):
         connections =  self.TCPServerSocket.copy()
+        if len(connections) == 0:
+            print("Not Intercepted yet")
         for conn_tuple in connections:
             print("Sending to: ", conn_tuple[0])
             conn_tuple[1].sendall(bytesToSend)
