@@ -14,8 +14,10 @@ class FrameBroadCaster():
         #asyncio.gather(self.listenInterceptors(self.UDPServerSocket))
     
     def initiateConnection(self, port):
+        time.sleep(1)
         print("Interceptor Listening Initiated : ", port)
         s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         print('Interceptor socket created')
         s.bind((self.localIP,port))
         print('Interceptor bind complete')
@@ -35,7 +37,13 @@ class FrameBroadCaster():
             print("Not Intercepted yet")
         for conn_tuple in connections:
             print("Sending to: ", conn_tuple[0])
-            conn_tuple[1].sendall(bytesToSend)
+            try:
+                conn_tuple[1].sendall(bytesToSend)
+            except:
+                self.TCPServerSocket.remove(conn_tuple)
+                listenor_thread = threading.Thread(target=self.initiateConnection, args=(conn_tuple[0], ))
+                listenor_thread.start()
+
 
 
 
