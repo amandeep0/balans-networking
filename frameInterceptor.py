@@ -23,7 +23,7 @@ while True:
         while len(data) < payload_size:
             print("Recv: {}".format(len(data)))
             recv, addr =  UDPClientSocket.recvfrom(bufferSize)
-	    data += recv
+            data += recv
         print("Done Recv: {}".format(len(data)))
         packed_msg_size = data[:payload_size]
         data = data[payload_size:]
@@ -31,15 +31,21 @@ while True:
         print("msg_size: {}".format(msg_size))
         while len(data) < msg_size:
             recv, addr = UDPClientSocket.recvfrom(bufferSize)
-	    data += recv
+            data += recv
         frame_data = data[:msg_size]
         data = data[msg_size:]
 
-        frame = pickle.loads(frame_data, fix_imports=True, encoding="bytes")
-        print("Broadcasting")
-        # broadcast_socket.sendto(frame_data, (UDP_IP, UDP_PORT))
-        frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-
+        try:
+            frame = pickle.loads(frame_data, fix_imports=True, encoding="bytes")
+            print("Broadcasting")
+            # broadcast_socket.sendto(frame_data, (UDP_IP, UDP_PORT))
+            frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+            resized = cv2.resize(frame, (64,64), interpolation = cv2.INTER_AREA)
+            cv2.imwrite('frame.jpg', resized)
+            cv2.imshow('frame', resized)
+            cv2.waitKey(1000)
+        except:
+            print("Problem broadcasting")
 
 
 
