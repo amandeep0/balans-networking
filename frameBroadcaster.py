@@ -13,6 +13,17 @@ class FrameBroadCaster():
         self.localPorts = ports
         self.TCPServerSocket = []
         #asyncio.gather(self.listenInterceptors(self.UDPServerSocket))
+    def connectRasPi(HOST, PORT):
+    s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    print('Socket created')
+    s.bind((HOST,PORT))
+    print('Socket bind complete')
+    s.listen(10)
+    conn,addr=s.accept()
+    return (conn,addr)
+
+    
+    
     def listenInterceptors(self):
         while True:
             print("Waiting For Interception")
