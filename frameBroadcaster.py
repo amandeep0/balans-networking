@@ -1,37 +1,41 @@
 import socket
-import queue
 import threading
 
 import time
 from networkingConstants import *
 
 class FrameBroadCaster():
-    def __init__(self, bufferSize = bufferSize, port = MASTER_UDP_PORT):
+    def __init__(self, bufferSize = bufferSize, ports = MASTER_RELAY_PORTS):
         self.connected_addresses = {}
         self.bufferSize = bufferSize
         self.localIP =  "0.0.0.0"
-        self.localPort = port
-        self.UDPServerSocket = self.initiateConnection()
+        self.localPorts = ports
+        self.TCPServerSocket = []
         #asyncio.gather(self.listenInterceptors(self.UDPServerSocket))
+    
+    def initiateConnection(self, port):
+        print("Interceptor Listening Initiated : ", port)
+        s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        print('Interceptor socket created')
+        s.bind((self.localIP,port))
+        print('Interceptor bind complete')
+        s.listen(10)
+        conn, addr=s.accept()
+        print("Intercepted", port)
+        self.TCPServerSocket.append((port, conn))
+    
     def listenInterceptors(self):
-        while True:
-            print("Waiting For Interception")
-            bytesAddressPair = self.UDPServerSocket.recvfrom(self.bufferSize)
-            message = bytesAddressPair[0]
-            address = bytesAddressPair[1]
-            print("Intercepted: ", address)
-            if address not in self.connected_addresses:
-                self.connected_addresses[address] = 1
-    def initiateConnection(self):
-        UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        UDPServerSocket.bind((self.localIP, self.localPort))
-        print("Binded to Socket")
-        return UDPServerSocket
+        for port in self.localPorts:
+            listenor_thread = threading.Thread(target=self.initiateConnection, args=(port, ))
+            listenor_thread.start()
 
     def sendData(self, bytesToSend):
-        for address in self.connected_addresses.keys():
-            print("Sending to: ", address)
-            self.UDPServerSocket.sendto(bytesToSend, address)
+        connections =  self.TCPServerSocket.copy()
+        if len(connections) == 0:
+            print("Not Intercepted yet")
+        for conn_tuple in connections:
+            print("Sending to: ", conn_tuple[0])
+            conn_tuple[1].sendall(bytesToSend)
 
 
 

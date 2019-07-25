@@ -24,9 +24,8 @@ def relayData(conn):
     data = b""
     payload_size = struct.calcsize(">L")
     print("payload_size: {}".format(payload_size))
-    socket = FrameBroadCaster(port=MASTER_UDP_PORT)
-    listenor_thread = threading.Thread(target=socket.listenInterceptors)
-    listenor_thread.start()
+    socket = FrameBroadCaster()
+    socket.listenInterceptors()
     while True:
         while len(data) < payload_size:
             print("Recv: {}".format(len(data)))
@@ -40,7 +39,9 @@ def relayData(conn):
         msg_size = struct.unpack(">L", packed_msg_size)[0]
         print("msg_size: {}".format(msg_size))
         while len(data) < msg_size:
-            data += conn.recv(bufferSize)
+            received_data = conn.recv(bufferSize)
+            socket.sendData(received_data)
+            data += received_data
         frame_data = data[:msg_size]
         data = data[msg_size:]
 
