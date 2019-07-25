@@ -40,7 +40,9 @@ def relayData(conn):
         msg_size = struct.unpack(">L", packed_msg_size)[0]
         print("msg_size: {}".format(msg_size))
         while len(data) < msg_size:
-            data += conn.recv(bufferSize)
+            received_data = conn.recv(bufferSize)
+            socket.sendData(received_data)
+            data += received_data
         frame_data = data[:msg_size]
         data = data[msg_size:]
 

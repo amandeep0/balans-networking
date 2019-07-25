@@ -29,7 +29,8 @@ class FrameBroadCaster():
         return UDPServerSocket
 
     def sendData(self, bytesToSend):
-        for address in self.connected_addresses.keys():
+        addresses = self.connected_addresses.keys()
+        for address in addresses:
             print("Sending to: ", address)
             self.UDPServerSocket.sendto(bytesToSend, address)
 
