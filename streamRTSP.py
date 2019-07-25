@@ -10,6 +10,7 @@ from picamera.array import PiRGBArray
 from picamera import PiCamera
 import time
 import cv2
+from networkingConstants import *
 
  # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
@@ -25,7 +26,7 @@ time.sleep(0.1)
 
 
 
-host  = '167.71.166.191'
+host  = MASTER_IP
 port  = 5006
 print("Begin")
 def connect():
