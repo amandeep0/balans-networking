@@ -13,25 +13,27 @@ class FrameBroadCaster():
         self.localPorts = ports
         self.TCPServerSocket = []
         #asyncio.gather(self.listenInterceptors(self.UDPServerSocket))
+    
     def initiateConnection(self, port):
+        print("Connection Initiated : ", port)
         s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         print('Socket created')
         s.bind((self.localIP,port))
         print('Socket bind complete')
         s.listen(10)
         conn, addr=s.accept()
-        self.TCPServerSocket.append({port: conn})
+        self.TCPServerSocket.append((port, conn))
     
     def listenInterceptors(self):
         for port in self.localPorts:
-            listenor_thread = threading.Thread(target=self.initiateConnection, args=(port))
-        listenor_thread.start()
+            listenor_thread = threading.Thread(target=self.initiateConnection, args=(port, ))
+            listenor_thread.start()
 
     def sendData(self, bytesToSend):
-        addresses = self.connected_addresses.keys()
-        for address in addresses:
-            print("Sending to: ", address)
-            self.UDPServerSocket.sendto(bytesToSend, address)
+        connections =  self.TCPServerSocket.copy()
+        for conn_tuple in connections:
+            print("Sending to: ", conn_tuple[0])
+            conn_tuple[1].sendall(bytesToSend)
 
 
 
